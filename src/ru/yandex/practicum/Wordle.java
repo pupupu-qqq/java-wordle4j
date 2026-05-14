@@ -1,7 +1,6 @@
 package ru.yandex.practicum;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -12,21 +11,26 @@ public class Wordle {
     private static final String LOG_FILE = "wordle.log";
 
     public static void main(String[] args) {
-        try (PrintWriter log = new PrintWriter(new FileWriter(LOG_FILE, StandardCharsets.UTF_8))) {
+        try (PrintWriter log = createLog()) {
             try {
                 run(log);
-            } catch (Throwable throwable) {
-                log.println("Unexpected error");
-                throwable.printStackTrace(log);
+            } catch (EmptyDictionaryException exception) {
+                log.println(exception.getMessage());
                 log.flush();
                 System.out.println("Игра завершилась с ошибкой. Подробности записаны в " + LOG_FILE);
             }
-        } catch (IOException exception) {
-            System.err.println("Не удалось создать лог-файл: " + exception.getMessage());
         }
     }
 
-    private static void run(PrintWriter log) throws IOException, EmptyDictionaryException {
+    private static PrintWriter createLog() {
+        try {
+            return new PrintWriter(new FileWriter(LOG_FILE, StandardCharsets.UTF_8));
+        } catch (java.io.IOException exception) {
+            throw new LogFileException(LOG_FILE, exception);
+        }
+    }
+
+    private static void run(PrintWriter log) throws EmptyDictionaryException {
         WordleDictionaryLoader loader = new WordleDictionaryLoader(log);
         WordleDictionary dictionary = loader.load(DICTIONARY_FILE);
         WordleGame game = new WordleGame(dictionary, log);

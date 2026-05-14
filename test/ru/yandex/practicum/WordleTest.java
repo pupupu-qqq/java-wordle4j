@@ -111,6 +111,12 @@ class WordleTest {
         assertEquals(Arrays.asList("ежики", "маска"), loaded.getWords());
     }
 
+    @Test
+    void loaderThrowsOwnExceptionWhenFileCannotBeRead() {
+        assertThrows(DictionaryLoadException.class, () ->
+                new WordleDictionaryLoader(testLog()).load("missing-dictionary-file.txt"));
+    }
+
     private PrintWriter testLog() {
         return new PrintWriter(System.out);
     }

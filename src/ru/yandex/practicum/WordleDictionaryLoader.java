@@ -16,7 +16,7 @@ public class WordleDictionaryLoader {
         this.log = log;
     }
 
-    public WordleDictionary load(String fileName) throws IOException, EmptyDictionaryException {
+    public WordleDictionary load(String fileName) throws EmptyDictionaryException {
         List<String> words = new ArrayList<>();
         int linesRead = 0;
 
@@ -26,6 +26,8 @@ public class WordleDictionaryLoader {
                 linesRead++;
                 words.add(line);
             }
+        } catch (IOException exception) {
+            throw new DictionaryLoadException(fileName, exception);
         }
 
         WordleDictionary dictionary = new WordleDictionary(words);
